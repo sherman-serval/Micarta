@@ -1,0 +1,39 @@
+// Crear partículas de texto
+function createTextParticles() {
+    const centerX = heartCanvas.width / 2;
+    const centerY = heartCanvas.height / 2;
+    const text = "Te amo chiquitita 💖"; // ← Frase modificada aquí
+    const fontSize = Math.min(heartCanvas.width, heartCanvas.height) * (isMobile ? config.text.fontSizeMobile : config.text.fontSizeDesktop);
+
+    ctx.font = `bold ${fontSize}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const textCanvas = document.createElement('canvas');
+    const textCtx = textCanvas.getContext('2d');
+    textCanvas.width = heartCanvas.width;
+    textCanvas.height = heartCanvas.height;
+
+    textCtx.font = ctx.font;
+    textCtx.textAlign = 'center';
+    textCtx.textBaseline = 'middle';
+    textCtx.fillStyle = 'white';
+    textCtx.fillText(text, centerX, centerY);
+
+    const textWidth = textCtx.measureText(text).width;
+    const textHeight = fontSize * 1.2;
+    const startX = centerX - textWidth / 2;
+    const startY = centerY - textHeight / 2;
+
+    const pixelData = textCtx.getImageData(0, 0, heartCanvas.width, heartCanvas.height).data;
+    const step = isMobile ? config.text.pixelStepMobile : config.text.pixelStepDesktop;
+
+    for (let y = startY; y < startY + textHeight; y += step) {
+        for (let x = startX; x < startX + textWidth; x += step) {
+            const pixelIndex = (Math.floor(y) * heartCanvas.width + Math.floor(x)) * 4;
+            if (pixelData[pixelIndex + 3] > 128) {
+                particles.push(new Particle(x, y, true));
+            }
+        }
+    }
+}
